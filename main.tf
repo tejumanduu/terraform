@@ -96,3 +96,31 @@ resource "aws_instance" "example" {
     Name = "MyEC2Instance"
   }
 }
+
+resource "aws_launch_configuration" "example_lc" {
+  name          = "example-launch-configuration"
+  image_id      = var.instance_ami
+  instance_type = var.instance_type
+  security_groups = [aws_security_group.web_sg.id]
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "aws_autoscaling_group" "example_asg" {
+  name                 = "example-autoscaling-group"
+  launch_configuration = aws_launch_configuration.example_lc.name
+  vpc_zone_identifier  = [aws_subnet.some_public_subnet.id, aws_subnet.some_private_subnet.id]
+  min_size             = 1
+  max_size             = 3
+  desired_capacity     = 2
+  target_group_arns    = [aws_lb_target_group.example_tg.arn]
+
+  tag {
+    key                 = "Name"
+    value               = "example-instance"
+    propagate_at_launch = true
+  }
+}
+
