@@ -32,3 +32,13 @@ variable "key_name" {
   description = "Name of the SSH key pair to use"
   default     = "777.pem"
 }
+
+variable "http_sg_cidr_blocks" {
+  type    = list(string)
+  default = ["0.0.0.0/0"]
+}
+
+variable "ssh_sg_cidr_blocks" {
+  type    = list(string)
+  default = ["0.0.0.0/0"]
+}
