@@ -1,9 +1,9 @@
 provider "aws" {
-  region = "us-east-1"
+  region = var.region
 }
 
 resource "aws_vpc" "some_custom_vpc" {
-  cidr_block = "10.0.0.0/16"
+  cidr_block = var.vpc_cidr_block
 
   tags = {
     Name = "Some Custom VPC"
@@ -12,7 +12,7 @@ resource "aws_vpc" "some_custom_vpc" {
 
 resource "aws_subnet" "some_public_subnet" {
   vpc_id            = aws_vpc.some_custom_vpc.id
-  cidr_block        = "10.0.1.0/24"
+  cidr_block        = var.public_subnet_cidr_block
   availability_zone = "us-east-1a"
 
   tags = {
@@ -22,7 +22,7 @@ resource "aws_subnet" "some_public_subnet" {
 
 resource "aws_subnet" "some_private_subnet" {
   vpc_id            = aws_vpc.some_custom_vpc.id
-  cidr_block        = "10.0.2.0/24"
+  cidr_block        = var.private_subnet_cidr_block
   availability_zone = "us-east-1a"
 
   tags = {
@@ -82,80 +82,15 @@ resource "aws_security_group" "web_sg" {
   egress {
     from_port   = 0
     to_port     = 0
-    protocol    = -1
+    protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
 
-resource "aws_network_acl" "public_nacl" {
-  vpc_id = aws_vpc.some_custom_vpc.id
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = -1
-    cidr_block  = "0.0.0.0/0"
-    rule_action = "allow"
-    rule_number = 100
-  }
-
-  ingress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_block  = "0.0.0.0/0"
-    rule_action = "allow"
-    rule_number = 200
-  }
-
-  ingress {
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_block  = "0.0.0.0/0"
-    rule_action = "allow"
-    rule_number = 300
-  }
-}
-
-resource "aws_network_acl" "private_nacl" {
-  vpc_id = aws_vpc.some_custom_vpc.id
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = -1
-    cidr_block  = "0.0.0.0/0"
-    rule_action = "allow"
-    rule_number = 100
-  }
-
-  ingress {
-    from_port   = 5432  # Example: PostgreSQL port
-    to_port     = 5432  # Example: PostgreSQL port
-    protocol    = "tcp"
-    cidr_block  = "0.0.0.0/0"
-    rule_action = "allow"
-    rule_number = 200
-  }
-}
-
-resource "aws_network_acl_association" "public_acl_association" {
-  subnet_id      = aws_subnet.some_public_subnet.id
-  network_acl_id = aws_network_acl.public_nacl.id
-}
-
-resource "aws_network_acl_association" "private_acl_association" {
-  subnet_id      = aws_subnet.some_private_subnet.id
-  network_acl_id = aws_network_acl.private_nacl.id
-}
-
 resource "aws_instance" "example" {
-  ami           = "ami-09538990a0c4fe9be"
-  instance_type = "t2.micro"
-  key_name      = "777.pem"
-  subnet_id     = aws_subnet.some_public_subnet.id  # or use the private subnet for a private instance
-  vpc_security_group_ids = [aws_security_group.web_sg.id]
+  ami           = var.instance_ami
+  instance_type = var.instance_type
+  key_name      = var.key_name
 
   tags = {
     Name = "MyEC2Instance"
