@@ -9,10 +9,11 @@ resource "aws_vpc" "some_custom_vpc" {
     Name = "Some Custom VPC"
   }
 }
+
 resource "aws_subnet" "some_public_subnet" {
   vpc_id            = aws_vpc.some_custom_vpc.id
   cidr_block        = "10.0.1.0/24"
-  availability_zone = "1a"
+  availability_zone = "us-east-1a"   # Change the availability zone to a valid one
 
   tags = {
     Name = "Some Public Subnet"
@@ -22,12 +23,13 @@ resource "aws_subnet" "some_public_subnet" {
 resource "aws_subnet" "some_private_subnet" {
   vpc_id            = aws_vpc.some_custom_vpc.id
   cidr_block        = "10.0.2.0/24"
-  availability_zone = "1a"
+  availability_zone = "us-east-1a"   # Change the availability zone to a valid one
 
   tags = {
     Name = "Some Private Subnet"
   }
 }
+
 resource "aws_internet_gateway" "some_ig" {
   vpc_id = aws_vpc.some_custom_vpc.id
 
@@ -35,6 +37,7 @@ resource "aws_internet_gateway" "some_ig" {
     Name = "Some Internet Gateway"
   }
 }
+
 resource "aws_route_table" "public_rt" {
   vpc_id = aws_vpc.some_custom_vpc.id
 
@@ -52,10 +55,12 @@ resource "aws_route_table" "public_rt" {
     Name = "Public Route Table"
   }
 }
+
 resource "aws_route_table_association" "public_1_rt_a" {
   subnet_id      = aws_subnet.some_public_subnet.id
   route_table_id = aws_route_table.public_rt.id
 }
+
 resource "aws_security_group" "web_sg" {
   name   = "HTTP and SSH"
   vpc_id = aws_vpc.some_custom_vpc.id
@@ -81,6 +86,7 @@ resource "aws_security_group" "web_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
+
 resource "aws_instance" "example" {
   ami           = "ami-09538990a0c4fe9be"  
   instance_type = "t2.micro"             
@@ -89,3 +95,4 @@ resource "aws_instance" "example" {
     Name = "MyEC2Instance"
   }
 }
+
