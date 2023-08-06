@@ -3,10 +3,9 @@ provider "aws" {
 }
 
 resource "aws_instance" "example" {
-  ami           = "ami-0c55b159cbfafe1f0"  # Replace with the desired AMI ID
-  instance_type = "t2.micro"              # Replace with the desired instance type
-  key_name      = "777.pem"    # Replace with the name of your existing key pair
-  
+  ami           = "ami-09538990a0c4fe9be"  
+  instance_type = "t2.micro"             
+  key_name      = "777.pem"   
   tags = {
     Name = "MyEC2Instance"
   }
