@@ -28,7 +28,7 @@ resource "aws_subnet" "some_private_subnet" {
     Name = "Some Private Subnet"
   }
 }
-esource "aws_internet_gateway" "some_ig" {
+resource "aws_internet_gateway" "some_ig" {
   vpc_id = aws_vpc.some_custom_vpc.id
 
   tags = {
@@ -88,3 +88,4 @@ resource "aws_instance" "example" {
   tags = {
     Name = "MyEC2Instance"
   }
+}
